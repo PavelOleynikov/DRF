@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 load_dotenv(override=True)  # override=True - перезаписывает переменные окружения
@@ -19,6 +20,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
+    "users",
+    "materials",
 ]
 
 MIDDLEWARE = [
