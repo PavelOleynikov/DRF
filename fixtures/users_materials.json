@@ -1,0 +1,54 @@
+[
+  {
+    "model": "users.user",
+    "pk": 1,
+    "fields": {
+      "email": "user1@example.com",
+      "phone_number": "+79990001122",
+      "city": "Москва"
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 2,
+    "fields": {
+      "email": "user2@example.com",
+      "phone_number": "+79990003344",
+      "city": "Санкт-Петербург"
+    }
+  },
+  {
+    "model": "materials.course",
+    "pk": 1,
+    "fields": {
+      "name": "Python для начинающих",
+      "description": "Базовый курс Python"
+    }
+  },
+  {
+    "model": "materials.course",
+    "pk": 2,
+    "fields": {
+      "name": "Django разработка",
+      "description": "Создание веб-приложений на Django"
+    }
+  },
+  {
+    "model": "materials.lesson",
+    "pk": 1,
+    "fields": {
+      "name": "Введение в Python",
+      "course": 1,
+      "link": "https://example.com/lesson1"
+    }
+  },
+  {
+    "model": "materials.lesson",
+    "pk": 2,
+    "fields": {
+      "name": "Установка Django",
+      "course": 2,
+      "link": "https://example.com/lesson2"
+    }
+  }
+]
