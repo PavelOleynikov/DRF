@@ -1,7 +1,9 @@
 from rest_framework import viewsets, generics
+from rest_framework.permissions import IsAuthenticated
 
 from materials.models import Course, Lesson
 from materials.serializers import CourseSerializer, LessonSerializer
+from users.permissions import ModeratorPermissions
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -10,11 +12,19 @@ class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
 
+    def get_permissions(self):
+        if self.action in ["create", "destroy"]:
+            self.permission_classes = [IsAuthenticated, ~ModeratorPermissions]
+        elif self.action in ["update", "retrieve"]:
+            self.permission_classes = [IsAuthenticated, ModeratorPermissions]
+        return super().get_permissions()
+
 
 class LessonCreateAPIView(generics.CreateAPIView):
     """Класс для создания урока"""
 
     serializer_class = LessonSerializer
+    permission_classes = [IsAuthenticated, ~ModeratorPermissions]
 
 
 class LessonListAPIView(generics.ListAPIView):
@@ -25,14 +35,14 @@ class LessonListAPIView(generics.ListAPIView):
 
 
 class LessonRetrieveAPIView(generics.RetrieveAPIView):
-    """ " Класс для получения конкретного урока"""
+    """Класс для получения конкретного урока"""
 
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
 
 
 class LessonUpdateAPIView(generics.UpdateAPIView):
-    """ " Класс для редактирования урока"""
+    """Класс для редактирования урока"""
 
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
@@ -42,3 +52,4 @@ class LessonDestroyAPIView(generics.DestroyAPIView):
     """Класс для удаления урока"""
 
     queryset = Lesson.objects.all()
+    permission_classes = [IsAuthenticated, ~ModeratorPermissions]
