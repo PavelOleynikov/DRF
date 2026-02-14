@@ -1,11 +1,11 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny
 
-from users.models import User
-from users.serializers import UserCreateSerializer, UserDetailViewSerializer, UserViewSerializer
+from users.models import Payments, User
+from users.serializers import UserCreateSerializer, UserDetailViewSerializer, UserViewSerializer, PaymentsSerializer
 
 
 class UserCreateAPIView(CreateAPIView):
@@ -34,3 +34,14 @@ class UserViewSet(viewsets.ModelViewSet):
         if self.action == "retrieve":
             return UserDetailViewSerializer
         return UserViewSerializer
+
+
+class PaymentsViewSet(viewsets.ModelViewSet):
+    """Класс для работы с платежами (вывод списка платежей)"""
+
+    queryset = Payments.objects.all()
+    serializer_class = PaymentsSerializer
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ["paid_course", "paid_lesson", "method_payment"]
+    ordering_fields = ["payment_date"]
+    ordering = ["-payment_date"]  # по умолчанию сортировка по дате оплаты по убыванию
