@@ -105,6 +105,7 @@ class LessonsTestCase(APITestCase):
             status.HTTP_200_OK,
         )
 
+
 class SubscriptionTestCase(APITestCase):
     """Класс для тестирования подписок на курсы"""
 
