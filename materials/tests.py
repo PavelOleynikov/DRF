@@ -125,12 +125,7 @@ class SubscriptionTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["message"], "Подписка добавлена")
-        self.assertTrue(
-            Subscription.objects.filter(
-                user=self.user,
-                course=self.course
-            ).exists()
-        )
+        self.assertTrue(Subscription.objects.filter(user=self.user, course=self.course).exists())
 
     def test_subscribe_remove(self):
         """Тест удаления подписки"""
