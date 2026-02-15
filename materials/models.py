@@ -1,13 +1,11 @@
 from django.db import models
 
-from users.models import User
-
 
 class Course(models.Model):
     name = models.CharField(max_length=150, verbose_name="Название")
     image = models.ImageField(upload_to="courses/", verbose_name="Картинка", null=True, blank=True)
     description = models.TextField(null=True, blank=True, verbose_name="Описание")
-    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Владелец")
+    owner = models.ForeignKey("users.User", on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Владелец")
 
     def __str__(self):
         return self.name
@@ -22,8 +20,10 @@ class Lesson(models.Model):
     image = models.ImageField(upload_to="lessons/", verbose_name="Картинка", null=True, blank=True)
     description = models.TextField(null=True, blank=True, verbose_name="Описание")
     link = models.URLField(verbose_name="Ссылка на видео", null=True, blank=True)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="lessons", verbose_name="Курс")
-    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Владелец")
+    course = models.ForeignKey(
+        "materials.Course", on_delete=models.CASCADE, related_name="lessons", verbose_name="Курс"
+    )
+    owner = models.ForeignKey("users.User", on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Владелец")
 
     def __str__(self):
         return self.name
