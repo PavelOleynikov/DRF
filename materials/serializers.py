@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from materials.models import Course, Lesson
 from materials.validators import validate_link
+from users.models import Subscription
 
 
 class LessonSerializer(serializers.ModelSerializer):
@@ -17,6 +18,7 @@ class LessonSerializer(serializers.ModelSerializer):
 class CourseSerializer(serializers.ModelSerializer):
     """Сериализатор для работы с курсами"""
 
+    is_subscribed = serializers.SerializerMethodField()
     lessons_count = serializers.SerializerMethodField()
     lessons = LessonSerializer(many=True, read_only=True)
 
@@ -27,3 +29,11 @@ class CourseSerializer(serializers.ModelSerializer):
     def get_lessons_count(self, obj):
         # Используем related_name "lessons" для доступа к урокам курса
         return obj.lessons.count()
+
+    def get_is_subscribed(self, obj):
+        """Проверяем, подписан ли пользователь на курс"""
+
+        request = self.context.get("request")
+        if request and request.user.is_authenticated:
+            return Subscription.objects.filter(user=request.user, course=obj).exists()
+        return False

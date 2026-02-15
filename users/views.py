@@ -1,9 +1,12 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, filters
-from rest_framework.generics import CreateAPIView
-from rest_framework.permissions import AllowAny
+from rest_framework.generics import CreateAPIView, get_object_or_404
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from users.models import Payments, User
+from materials.models import Course
+from users.models import Payments, User, Subscription
 from users.serializers import UserCreateSerializer, UserDetailViewSerializer, UserViewSerializer, PaymentsSerializer
 
 
@@ -44,3 +47,24 @@ class PaymentsViewSet(viewsets.ModelViewSet):
     filterset_fields = ["paid_course", "paid_lesson", "method_payment"]
     ordering_fields = ["payment_date"]
     ordering = ["-payment_date"]  # по умолчанию сортировка по дате оплаты по убыванию
+
+
+class SubscriptionAPIView(APIView):
+    """Класс для работы с подписками"""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        course_id = request.data.get("course_id")
+        course_item = get_object_or_404(Course, id=course_id)
+        subs_item = Subscription.objects.filter(user=request.user, course=course_item)
+
+        if subs_item.exists():
+            subs_item.delete()
+            message = "Подписка удалена"
+
+        else:
+            Subscription.objects.create(user=request.user, course=course_item)
+            message = "Подписка добавлена"
+
+        return Response({"message": message})
