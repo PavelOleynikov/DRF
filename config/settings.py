@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_filters",
+    "drf_yasg",  # для документации
     "rest_framework",
     "rest_framework_simplejwt",  # для аутентификации
     "users",
