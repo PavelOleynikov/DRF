@@ -4,6 +4,7 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 
 from materials.models import Course, Lesson
+from materials.paginators import MaterialsPaginator
 from materials.serializers import CourseSerializer, LessonSerializer
 from users.permissions import ModeratorPermissions, IsOwner
 
@@ -13,6 +14,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+    pagination_class = MaterialsPaginator
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ["name"]
     ordering_fields = ["name"]
@@ -49,6 +51,7 @@ class LessonListAPIView(generics.ListAPIView):
     """Класс для получения списка уроков"""
 
     serializer_class = LessonSerializer
+    pagination_class = MaterialsPaginator
     queryset = Lesson.objects.all()
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ["course"]

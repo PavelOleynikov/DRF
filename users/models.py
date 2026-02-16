@@ -3,6 +3,7 @@ from django.db import models
 
 
 class User(AbstractUser):
+    """Класс пользователя."""
 
     username = None
 
@@ -53,3 +54,24 @@ class Payments(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.paid_course} - {self.paid_lesson}"
+
+
+class Subscription(models.Model):
+    """Класс подписки пользователя на курс"""
+
+    user = models.ForeignKey(
+        "users.User", on_delete=models.CASCADE, related_name="subscription", verbose_name="пользователь"
+    )
+    course = models.ForeignKey(
+        "materials.Course", on_delete=models.CASCADE, related_name="subscription", verbose_name="подписка на курс"
+    )
+    subscription_date = models.DateTimeField(auto_now_add=True, verbose_name="дата подписки")
+
+    class Meta:
+        verbose_name = "Подписка"
+        verbose_name_plural = "Подписки"
+        ordering = ["-subscription_date"]
+        unique_together = ["user", "course"]
+
+    def __str__(self):
+        return f"{self.user.email} - подписан на {self.course.name}"
