@@ -7,7 +7,14 @@ from rest_framework.views import APIView
 
 from materials.models import Course
 from users.models import Payments, User, Subscription
-from users.serializers import UserCreateSerializer, UserDetailViewSerializer, UserViewSerializer, PaymentsSerializer
+from users.serializers import (
+    UserCreateSerializer,
+    UserDetailViewSerializer,
+    UserViewSerializer,
+    PaymentsSerializer,
+    PaymentsCreateSerializer,
+)
+from users.services import create_stripe_price, create_stripe_session, create_stripe_product
 
 
 class UserCreateAPIView(CreateAPIView):
@@ -36,6 +43,29 @@ class UserViewSet(viewsets.ModelViewSet):
         if self.action == "retrieve":
             return UserDetailViewSerializer
         return UserViewSerializer
+
+
+class PaymentsCreateAPIView(CreateAPIView):
+    """Класс создания платежа на продукт"""
+
+    serializer_class = PaymentsCreateSerializer
+    queryset = Payments.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+    def perform_create(self, serializer):
+        payment = serializer.save(user=self.request.user)
+        if payment.paid_course:
+            product_name = payment.paid_course.name
+        elif payment.paid_lesson:
+            product_name = payment.paid_lesson.name
+        else:
+            product_name = f"Оплата на сумму {payment.amount} руб."
+        product = create_stripe_product(product_name)
+        price = create_stripe_price(payment.amount, product)
+        session_id, link_for_payment = create_stripe_session(price)
+        payment.session_id = session_id
+        payment.link_for_payment = link_for_payment
+        payment.save()
 
 
 class PaymentsViewSet(viewsets.ModelViewSet):
