@@ -23,6 +23,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_filters",
     "drf_yasg",  # для документации
+    "corsheaders",  # для CORS
+    "django_celery_beat",  # для планирования задач
     "stripe",  # для платежей
     "rest_framework",
     "rest_framework_simplejwt",  # для аутентификации
@@ -119,3 +121,26 @@ SIMPLE_JWT = {
 }
 
 STRIPE_API_KEY = os.getenv("STRIPE_API_KEY")
+
+CACHE_ENABLED = True
+if CACHE_ENABLED:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": os.getenv("LOCATION"),
+        }
+    }
+
+# URL-адрес брокера сообщений
+CELERY_BROKER_URL = os.getenv("LOCATION")
+
+# URL-адрес брокера результатов
+CELERY_RESULT_BACKEND = os.getenv("LOCATION")
+
+# Настройки для Celery вручную (не через админку)
+# CELERY_BEAT_SCHEDULE = {
+#     'task-name': {
+#         'task': 'vehicle.tasks.check_milage',  # Путь к задаче
+#         'schedule': timedelta(minutes=10),  # Расписание выполнения задачи (например, каждые 10 минут)
+#     },
+# }
