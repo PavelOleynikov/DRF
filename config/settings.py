@@ -2,6 +2,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from celery.schedules import crontab
 from dotenv import load_dotenv
 
 load_dotenv(override=True)  # override=True - перезаписывает переменные окружения
@@ -141,13 +142,13 @@ CELERY_BROKER_URL = os.getenv("LOCATION")
 # URL-адрес брокера результатов
 CELERY_RESULT_BACKEND = os.getenv("LOCATION")
 
-# Настройки для Celery вручную (не через админку)
-# CELERY_BEAT_SCHEDULE = {
-#     'task-name': {
-#         'task': 'vehicle.tasks.check_milage',  # Путь к задаче
-#         'schedule': timedelta(minutes=10),  # Расписание выполнения задачи (например, каждые 10 минут)
-#     },
-# }
+# Настройки выполнения периодической задачи для Celery-beat
+CELERY_BEAT_SCHEDULE = {
+    "block_inactive_users": {
+        "task": "users.tasks.block_inactive_users",  # Путь к задаче
+        "schedule": crontab(day_of_month=1, hour=0, minute=0),  # Расписание выполнения задачи
+    },
+}
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.yandex.ru"
