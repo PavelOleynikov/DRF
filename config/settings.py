@@ -131,6 +131,10 @@ if CACHE_ENABLED:
         }
     }
 
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
 # URL-адрес брокера сообщений
 CELERY_BROKER_URL = os.getenv("LOCATION")
 
@@ -144,3 +148,12 @@ CELERY_RESULT_BACKEND = os.getenv("LOCATION")
 #         'schedule': timedelta(minutes=10),  # Расписание выполнения задачи (например, каждые 10 минут)
 #     },
 # }
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.yandex.ru"
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
