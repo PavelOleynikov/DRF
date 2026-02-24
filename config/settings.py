@@ -2,6 +2,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from celery.schedules import crontab
 from dotenv import load_dotenv
 
 load_dotenv(override=True)  # override=True - перезаписывает переменные окружения
@@ -23,6 +24,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_filters",
     "drf_yasg",  # для документации
+    "corsheaders",  # для CORS
+    "django_celery_beat",  # для планирования задач
     "stripe",  # для платежей
     "rest_framework",
     "rest_framework_simplejwt",  # для аутентификации
@@ -119,3 +122,39 @@ SIMPLE_JWT = {
 }
 
 STRIPE_API_KEY = os.getenv("STRIPE_API_KEY")
+
+CACHE_ENABLED = True
+if CACHE_ENABLED:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": os.getenv("LOCATION"),
+        }
+    }
+
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+# URL-адрес брокера сообщений
+CELERY_BROKER_URL = os.getenv("LOCATION")
+
+# URL-адрес брокера результатов
+CELERY_RESULT_BACKEND = os.getenv("LOCATION")
+
+# Настройки выполнения периодической задачи для Celery-beat
+CELERY_BEAT_SCHEDULE = {
+    "block_inactive_users": {
+        "task": "users.tasks.block_inactive_users",  # Путь к задаче
+        "schedule": crontab(day_of_month=1, hour=0, minute=0),  # Расписание выполнения задачи
+    },
+}
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.yandex.ru"
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
