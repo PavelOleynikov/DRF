@@ -22,7 +22,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django_filters",
+    "django_filters",  # для фильтрации в DRF
     "drf_yasg",  # для документации
     "corsheaders",  # для CORS
     "django_celery_beat",  # для планирования задач
@@ -41,7 +41,19 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
 ]
+
+# Настройки для работы с CORS
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8000",
+]
+
+CORS_ALLOW_ALL_ORIGINS = False
 
 ROOT_URLCONF = "config.urls"
 
@@ -123,6 +135,7 @@ SIMPLE_JWT = {
 
 STRIPE_API_KEY = os.getenv("STRIPE_API_KEY")
 
+# Настройки Redis для кэширования
 CACHE_ENABLED = True
 if CACHE_ENABLED:
     CACHES = {
@@ -137,10 +150,10 @@ CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 
 # URL-адрес брокера сообщений
-CELERY_BROKER_URL = os.getenv("LOCATION")
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
 
 # URL-адрес брокера результатов
-CELERY_RESULT_BACKEND = os.getenv("LOCATION")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
 
 # Настройки выполнения периодической задачи для Celery-beat
 CELERY_BEAT_SCHEDULE = {
@@ -150,8 +163,9 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
+# Настройки для отправки электронной почты
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.yandex.ru"
+EMAIL_HOST = os.getenv("EMAIL_HOST")
 EMAIL_PORT = os.getenv("EMAIL_PORT")
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
