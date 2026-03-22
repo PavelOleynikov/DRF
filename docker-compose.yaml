@@ -22,6 +22,7 @@ services:
       - .env
     environment:
       HOST: db
+      DB_USER: pavlushka-1980
 
   # Сервис базы данных (PostgreSQL)
   db:
@@ -31,14 +32,14 @@ services:
       - .env
     environment:
       - POSTGRES_DB=${NAME}
-      - POSTGRES_USER=${USER}
+      - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${PASSWORD}
     # том для сохранения данных БД
     volumes:
       - postgres_data:/var/lib/postgresql/data
     # проверка, что БД готова
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${USER} -d ${NAME}" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${NAME}" ]
       # проверять каждые 30 секунд
       interval: 30s
       # ждать ответа 10 секунд
