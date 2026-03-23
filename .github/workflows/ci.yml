@@ -86,15 +86,35 @@ jobs:
 
     steps:
       - name: Set up SSH # Настраивает SSH-агент с приватным ключом для доступа к серверу
-        uses: webfactory/ssh-agent@v0.10.0
+        uses: webfactory/ssh-agent@v0
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
       - name: Deploy to server # Выполняет команды на удалённом сервере через SSH
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << "EOF"
-            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
-            docker stop myapp || true
-            docker rm myapp || true
-            docker run -d --name myapp -p 80:8000 ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+            cd ~/DRF
+          
+            # Обновляем .env файл
+            cat > .env << 'ENV_EOF'
+            SECRET_KEY=${{ secrets.SECRET_KEY }}
+            DEBUG=0
+            NAME=${DB_NAME:-mydb}
+            DB_USER=${DB_USER:-postgres}
+            PASSWORD=${DB_PASSWORD:-password}
+            HOST=db
+            PORT=5432
+            ENV_EOF
+          
+            # Останавливаем старые контейнеры
+            docker compose down
+          
+            # Обновляем образы
+            docker compose pull web celery celery_beat
+          
+            # Запускаем все сервисы
+            docker compose up -d
+          
+            # Очищаем неиспользуемые образы
+            docker image prune -f
           EOF
