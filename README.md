@@ -86,18 +86,21 @@
 /users/ Управление пользователями
 /users/payments/ Управление платежами
 /users/subscribe/ Управление подписками
+/swagger/ Swagger документация
 
 ### 7. Установка проекта
 
 Установка с использованием Poetry (рекомендуется)
 
 - git clone https://github.com/PavelOleynikov/DRF.git
-- cd DjangoDRF
+- cd DRF
 - poetry install
 - poetry shell
 - python manage.py migrate
 - python manage.py createsuperuser
 - python manage.py runserver
+
+Перед запуском скопируйте `.env.example` в `.env` и укажите свои значения
 
 ### 8. Запуск проекта с использованием Docker Compose
 
@@ -116,7 +119,7 @@ Django, базы данных PostgreSQL, Redis и Celery (worker и beat).
   перейдите в корневую директорию вашего проекта (где находится файл docker-compose.yml и Dockerfile).
 
 - Затем выполните следующую команду:
-  docker-compose up --build или docker-compose -f docker-compose.yaml up
+  docker-compose up -d --build или docker-compose -f docker-compose.yaml up
 
 * API будет доступно по адресу: http://localhost:8000/
 * Для авторизации используйте полученный при регистрации email и пароль
@@ -134,3 +137,48 @@ Django, базы данных PostgreSQL, Redis и Celery (worker и beat).
 - Перезапуск: docker-compose restart
 - Миграции: docker-compose exec web python manage.py migrate
 - Суперпользователь: docker-compose exec web python manage.py createsuperuser
+
+## 9. Настройка удаленного сервера
+
+### Требования
+
+- Ubuntu 22.04/24.04 LTS
+- Docker и Docker Compose
+- Открыты порты: 22 (SSH), 80 (HTTP)
+
+### Установка Docker Compose
+
+sudo apt install docker-compose-plugin
+
+## 10. Раздел "CI/CD Pipeline (GitHub Actions)"
+
+```markdown
+
+Файл `.github/workflows/ci.yml`:
+
+| Job | Описание |
+|-----|----------|
+| **lint** | Проверка кода flake8 |
+| **test** | Запуск тестов Django |
+| **build** | Сборка и публикация Docker образа |
+| **deploy** | Деплой на сервер через SSH |
+
+### Secrets GitHub
+- `SECRET_KEY` — ключ Django
+- `DOCKER_HUB_USERNAME` — логин Docker Hub
+- `DOCKER_HUB_ACCESS_TOKEN` — токен Docker Hub
+- `SSH_KEY` — приватный ключ
+- `SSH_USER` — пользователь сервера
+- `SERVER_IP` — IP сервера
+
+### Процесс деплоя
+1. Push → запуск workflow
+2. Линтинг → тесты → сборка образа → публикация в Docker Hub → деплой на сервер
+
+### Мониторинг деплоя
+
+# На сервере
+cd ~/DRF
+docker compose ps
+docker compose logs -f web
+docker compose logs -f nginx
