@@ -10,10 +10,10 @@ jobs:
 
     steps:
       - name: Check out code # Загружает исходный код репозитория в виртуальную машину GitHub Actions
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python # Устанавливает указанную версию Python в окружение сборщика
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.13.5"
 
@@ -29,18 +29,21 @@ jobs:
   test: # Запуск тестов Django
     needs: lint # Зависимость: запускается только после успешного выполнения lint
     runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      DEBUG: "0"
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.13.5"
 
       - name: Cache Poetry dependencies # Кэширует зависимости Poetry для ускорения последующих запусков
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/pypoetry
           key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
@@ -65,7 +68,7 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Log in to Docker Hub # Аутентификация в Docker Hub
         run: echo "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
