@@ -99,6 +99,17 @@ services:
       CELERY_BROKER_URL: redis://redis:6379
       CELERY_RESULT_BACKEND: redis://redis:6379
 
+  nginx:
+    build: ./nginx
+    container_name: drf-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - static_volume:/app/staticfiles
+    depends_on:
+      - web
+
 networks:
   default:
 
