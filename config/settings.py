@@ -75,7 +75,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-if "test" in sys.argv:
+if "test" in sys.argv or os.getenv("GITHUB_ACTIONS") == "true":
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",

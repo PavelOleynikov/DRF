@@ -32,6 +32,7 @@ jobs:
     env:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       DEBUG: "0"
+      GITHUB_ACTIONS: "true"
 
     steps:
       - name: Check out code
